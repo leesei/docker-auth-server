@@ -1,0 +1,10 @@
+{
+  "admin": {
+    "password": "$2b$09$kYQFRBTSp7T6BS.YMJHE4ueiVZecuLF/5m0muX2wpSGrNFm6EzZ7y",
+    "scope": ["admin"]
+  },
+  "user": {
+    "password": "$2b$09$zEA78t1ozkD7KIe9j8w/iepXxOkDWWBs49Uy1M5RcF5zrxBH7feGK",
+    "scope": ["user"]
+  }
+}
