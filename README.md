@@ -63,7 +63,7 @@ yarn start
 
 ```sh
 # docker staging, using mount
-docker run -it --rm --name leesei/docker-auth-server -p 8000:8000 \
+docker run -it --rm --name docker-auth-server -p 8000:8000 \
   -v $PWD/sample:/configs \
   -v $PWD/context/app:/pwd -w /pwd \
   --entrypoint bash \
@@ -77,7 +77,7 @@ docker secret create jwt_private ./jwt_private.pem
 docker secret create users ./users.json
 docker config create jwt_public ./jwt_public.pem
 
-docker service create --name leesei/docker-auth-server -p 8000:8000 \
+docker service create --name docker-auth-server -p 8000:8000 \
   --secret source=jwt_private,target=/configs/jwt_private.pem \
   --secret source=users,target=/configs/users.json \
   --config source=jwt_public,target=/configs/jwt_public.pem \
