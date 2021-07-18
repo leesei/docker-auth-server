@@ -1,6 +1,6 @@
 # docker-auth-server
 
-[![leesei/auth-server](https://dockeri.co/image/leesei/auth-server)](https://dockeri.co/image/leesei/auth-server)
+[![leesei/auth-server](https://dockeri.co/image/leesei/auth-server)](https://hub.docker.com/r/leesei/auth-server)
 
 Dockerized JWT key server with [auth0/node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken).
 

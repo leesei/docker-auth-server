@@ -13,6 +13,7 @@ ENV PRIVATE_KEY_PATH "/configs/jwt_private.pem"
 ENV USERS_PATH "/configs/users.json"
 
 WORKDIR /opt/app
+COPY app/package.json .
 COPY app/yarn.lock .
 RUN yarn install
 COPY app .
