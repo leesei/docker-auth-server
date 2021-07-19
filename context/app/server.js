@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-
 const Bcrypt = require("bcrypt");
+const Fs = require("fs");
+const Util = require("util");
+
 const Boom = require("@hapi/boom");
 const Hapi = require("@hapi/hapi");
 const Joi = require("joi");
@@ -15,9 +16,9 @@ const SvgCaptcha = require("svg-captcha");
 
 require("dotenv").config({ debug: process.env.DEBUG });
 
-const PUBLIC_KEY = fs.readFileSync(process.env.PUBLIC_KEY_PATH, "utf8");
-const PRIVATE_KEY = fs.readFileSync(process.env.PRIVATE_KEY_PATH, "utf8");
-const USERS = JSON.parse(fs.readFileSync(process.env.USERS_PATH, "utf8"));
+const PUBLIC_KEY = Fs.readFileSync(process.env.PUBLIC_KEY_PATH, "utf8");
+const PRIVATE_KEY = Fs.readFileSync(process.env.PRIVATE_KEY_PATH, "utf8");
+const USERS = JSON.parse(Fs.readFileSync(process.env.USERS_PATH, "utf8"));
 
 const argv = ParseArgs(process.argv.slice(2), {
   alias: {
@@ -80,6 +81,7 @@ server.route({
 
       if (record === null || record.captcha !== request.payload.captcha) {
         captchas.findAndRemove({ sessionId: request.payload.sessionId });
+        request.log(["info"], `invalid captcha`);
         return Boom.unauthorized("invalid.login");
       }
     }
@@ -90,6 +92,7 @@ server.route({
       user ? user.password : ""
     );
     if (match) {
+      request.log(["info"], `login success`);
       return Jwt.sign(
         {
           sub: request.payload.username,
@@ -101,7 +104,7 @@ server.route({
         { algorithm: "RS256", expiresIn: EXPIRES_IN }
       );
     }
-    request.log(["error"], "invalid login");
+    request.log(["info"], `invalid login`);
     return Boom.unauthorized("invalid.login");
   },
   options: {
@@ -204,13 +207,23 @@ server.route({
 });
 
 server.events.on("request", (request, event, tags) => {
-  if (tags.error) {
-    console.log(
-      `Request [${request.path}][${event.request}] error: ${
-        event.error ? event.error.message : "unknown"
-      }`
-    );
+  // console.log(request);
+  // console.log(event);
+  const message = {
+    timestamp: new Date(event.timestamp),
+    channel: event.channel,
+    tags: event.tags,
+    path: request.path,
+    remoteaddr: request.info.remoteAddress,
+    data: null,
+  };
+  if (tags.info) {
+    message.data = event.data;
+  } else if (tags.error) {
+    message.data = event.error.message;
+    message.statusCode = event.error.output.statusCode;
   }
+  console.log(Util.inspect(message, { breakLength: Infinity }));
 });
 
 process.on("unhandledRejection", (err) => {

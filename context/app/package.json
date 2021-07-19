@@ -1,7 +1,7 @@
 {
   "name": "jwt-keyserver",
   "description": "A JWT server",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "author": "leesei <leesei@gmail.com>",
   "bin": "./server.js",
