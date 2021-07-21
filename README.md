@@ -14,7 +14,10 @@ Dockerized JWT key server with [auth0/node-jsonwebtoken](https://github.com/auth
   client must use `/captcha` or `/captcha.html` and solve the captcha first  
   temp sessions will be created with [techfort/LokiJS](https://github.com/techfort/LokiJS/)
 - Captcha is disable by default  
-  use `-c`/`--captcha` and Docker `COMMAND` to enable
+  use `--captcha` and Docker `COMMAND` to enable
+- Compare with bcrypt hashed password  
+  helper script `password_hash.js`
+  use `--plaintext` to enable (**NOT RECOMMENDED FOR PRODUCTION**)
 
 ## Configs
 
@@ -45,12 +48,13 @@ openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 \
 
 ### User Credentials
 
-Sample `users.json` is in `sample/`, **DO NOT** use it in production.  
+Sample `user_plaintext.json`/`users.json` are in `sample/`, **DO NOT** use in production.  
 Hashed password can be created with:
 
 ```sh
 cd context/app/
-./password_hash.js pa$$w0rd
+./password_hash.js pa$$w0rd  # single password
+./password_hash.js users_plaintext.json > user.json  # password field JSON file
 ```
 
 ## Starting server

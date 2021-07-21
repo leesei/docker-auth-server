@@ -2,7 +2,6 @@
 
 const Bcrypt = require("bcrypt");
 const Fs = require("fs");
-const Util = require("util");
 
 const Boom = require("@hapi/boom");
 const Hapi = require("@hapi/hapi");
@@ -11,7 +10,6 @@ const Jwt = require("jsonwebtoken");
 const Loki = require("lokijs");
 const Ms = require("ms");
 const Nanoid = require("nanoid");
-const ParseArgs = require("minimist");
 const SvgCaptcha = require("svg-captcha");
 
 require("dotenv").config({ debug: process.env.DEBUG });
@@ -20,14 +18,14 @@ const PUBLIC_KEY = Fs.readFileSync(process.env.PUBLIC_KEY_PATH, "utf8");
 const PRIVATE_KEY = Fs.readFileSync(process.env.PRIVATE_KEY_PATH, "utf8");
 const USERS = JSON.parse(Fs.readFileSync(process.env.USERS_PATH, "utf8"));
 
-const argv = ParseArgs(process.argv.slice(2), {
+const argv = require("minimist")(process.argv.slice(2), {
   alias: {
     p: "port",
-    c: "captcha",
   },
   default: {
     port: 8000,
     captcha: false,
+    plaintext: false,
   },
   boolean: ["captcha"],
   "--": true,
@@ -36,7 +34,7 @@ const argv = ParseArgs(process.argv.slice(2), {
 
 const SESSION_TTL = process.env.SESSION_TTL || "5m";
 const db = new Loki("lokidb");
-// collection to store `{ sessionId: string, captcha: string, ttl: number }`
+// collection to store `{ sessionId: string, captcha: string }`
 const captchas = db.addCollection("captchas", {
   indices: ["sessionId"],
   ttl: Ms(SESSION_TTL),
@@ -79,18 +77,17 @@ server.route({
       captchas.findAndRemove({ sessionId: request.payload.sessionId });
       // console.log("record:", record);
 
-      if (record === null || record.captcha !== request.payload.captcha) {
-        captchas.findAndRemove({ sessionId: request.payload.sessionId });
+      if (record === undefined || record.captcha !== request.payload.captcha) {
         request.log(["info"], `invalid captcha`);
         return Boom.unauthorized("invalid.login");
       }
     }
 
-    // force a password hash comparison
-    const match = await Bcrypt.compare(
-      request.payload.password,
-      user ? user.password : ""
-    );
+    // force a password hash comparison even if user is not found
+    const userpass = user ? user.password : "";
+    const match = argv.plaintext
+      ? request.payload.password === userpass
+      : await Bcrypt.compare(request.payload.password, userpass);
     if (match) {
       request.log(["info"], `login success`);
       return Jwt.sign(
@@ -158,7 +155,7 @@ if (argv.captcha) {
       <html><body>
         <h4>sessionId: ${sessionId}</h4>
         <h4>ttl (ms): ${ttl}</h4>
-        <svg>${svg}</svg>
+        ${svg}
       </html></body>
       `;
     },
@@ -206,36 +203,27 @@ server.route({
   },
 });
 
-server.events.on("request", (request, event, tags) => {
-  // console.log(request);
-  // console.log(event);
-  const message = {
-    timestamp: new Date(event.timestamp),
-    channel: event.channel,
-    tags: event.tags,
-    path: request.path,
-    remoteaddr: request.info.remoteAddress,
-    data: null,
-  };
-  if (tags.info) {
-    message.data = event.data;
-  } else if (tags.error) {
-    message.data = event.error.message;
-    message.statusCode = event.error.output.statusCode;
-  }
-  console.log(Util.inspect(message, { breakLength: Infinity }));
-});
-
 process.on("unhandledRejection", (err) => {
-  console.log(err);
+  server.log(["error"], err);
   process.exit(1);
 });
 
 const init = async () => {
+  await server.register({
+    plugin: require("hapi-pino"),
+    options: {
+      mergeHapiLogData: true,
+      // this removes duplicated req/res
+      getChildBindings: () => ({}),
+      serializers: require("pino-noir")(["req.headers", "res.headers"]),
+      // Redact Authorization headers, see https://getpino.io/#/docs/redaction
+      // redact: ["req.headers.authorization"],
+    },
+  });
+
   await server.start();
-  console.log(`Server running at: ${server.info.uri}`);
   if (argv.captcha) {
-    console.log("!! Requires Captcha challenge !!");
+    server.log(["info"], "!! Requires Captcha challenge !!");
   }
 };
 

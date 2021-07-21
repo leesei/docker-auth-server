@@ -1,0 +1,10 @@
+{
+  "admin": {
+    "password": "admin",
+    "scope": ["admin"]
+  },
+  "user": {
+    "password": "user",
+    "scope": ["user"]
+  }
+}
