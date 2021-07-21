@@ -64,6 +64,15 @@ const server = Hapi.Server({
   },
 });
 
+// these routes are needed for CORS
+server.route({
+  method: ["GET", "OPTIONS"],
+  path: "/",
+  handler: async (request, h) => {
+    return `JWT server: ${ISSUER}`;
+  },
+});
+
 server.route({
   method: "POST",
   path: "/",
