@@ -18,7 +18,9 @@ const argv = ParseArgs(process.argv.slice(2), {
   },
   default: {
     rounds: 9,
+    check: false,
   },
+  boolean: ["check"],
   "--": true,
 });
 // console.log(argv); process.exit(0);
@@ -34,7 +36,17 @@ if (Fs.existsSync(argv._[0])) {
   for (var k in users) {
     users[k].password = Bcrypt.hashSync(users[k].password, argv.rounds);
   }
-  console.log(JSON.stringify(users, null, 2));
+
+  if (argv.check) {
+    const plain = JSON.parse(Fs.readFileSync(argv._[0], "utf8"));
+    for (k in users) {
+      const match = Bcrypt.compareSync(plain[k].password, users[k].password);
+      if (!match) console.log(`[${k}] mismatch`);
+    }
+    console.log("check done");
+  } else {
+    console.log(JSON.stringify(users, null, 2));
+  }
 } else {
   console.log(Bcrypt.hashSync(argv._[0], argv.rounds));
 }
