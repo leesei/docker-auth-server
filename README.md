@@ -16,7 +16,7 @@ Dockerized JWT key server with [auth0/node-jsonwebtoken](https://github.com/auth
 - Captcha is disable by default  
   use `--captcha` and Docker `COMMAND` to enable
 - Compare with bcrypt hashed password  
-  helper script `password_hash.js`
+  helper script `password_hash.js`  
   use `--plaintext` to enable (**NOT RECOMMENDED FOR PRODUCTION**)
 
 ## Configs
@@ -54,8 +54,10 @@ Hashed password can be created with:
 ```sh
 cd context/app/
 ./password_hash.js pa$$w0rd  # single password
-./password_hash.js users_plaintext.json > user.json  # password field JSON file
+./password_hash.js users_plaintext.json > user.json  # hash all `password` fields JSON file
 ```
+
+> `scope` field is added to the claim, it is compatible to [Hapi's authorization convention](https://github.com/hapijs/hapi/blob/master/API.md#-routeoptionsauthaccessscope)
 
 ## Starting server
 
