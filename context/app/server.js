@@ -145,7 +145,7 @@ if (argv.captcha) {
   }
 
   server.route({
-    method: "GET",
+    method: ["GET", "POST"],
     path: "/captcha",
     handler: (request, h) => {
       return createCaptchaSession();
