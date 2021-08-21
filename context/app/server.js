@@ -78,7 +78,8 @@ server.route({
   path: "/",
   handler: async (request, h) => {
     const epoch = Math.floor(Date.now() / 1000) - 10;
-    const user = USERS[request.payload.username];
+    const username = request.payload.username;
+    const user = USERS[username];
 
     if (argv.captcha) {
       const record = captchas.by("sessionId", request.payload.sessionId);
@@ -98,10 +99,10 @@ server.route({
       ? request.payload.password === userpass
       : await Bcrypt.compare(request.payload.password, userpass);
     if (match) {
-      request.log(["info"], `login success`);
+      request.log(["info"], `[${username}] login success`);
       return Jwt.sign(
         {
-          sub: request.payload.username,
+          sub: username,
           iat: epoch,
           scope: user.scope,
           iss: ISSUER,
@@ -110,7 +111,7 @@ server.route({
         { algorithm: "RS256", expiresIn: EXPIRES_IN }
       );
     }
-    request.log(["info"], `invalid login`);
+    request.log(["info"], `[${username}] invalid login`);
     return Boom.unauthorized("invalid.login");
   },
   options: {
