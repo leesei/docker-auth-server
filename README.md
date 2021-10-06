@@ -4,12 +4,12 @@
 
 Dockerized JWT key server with [auth0/node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken).
 
-- load signature keys (X.509 RS256 key pair) and users from file system  
+- load signature keys (X.509 RS256 key pair) and users JSON from file system  
   `/config/jwt_private.pem`, `/config/jwt_public.pem`, `/config/users.json`  
   compatible with docker secret and config
-- does not support secure connection  
+- does not support secured connection  
   relies on the network layer (reverse proxy, VPC or secure overlay network) for security
-- listens on port 8000 by default
+- listens on port `8000` by default
 - supports [svg-captcha](https://openbase.com/js/svg-captcha) MFA  
   client must use `/captcha` or `/captcha.html` and solve the captcha first  
   temp sessions will be created with [techfort/LokiJS](https://github.com/techfort/LokiJS/)
@@ -17,11 +17,11 @@ Dockerized JWT key server with [auth0/node-jsonwebtoken](https://github.com/auth
   use `--captcha` and Docker `COMMAND` to enable
 - Compare with bcrypt hashed password  
   helper script `password_hash.js`  
-  use `--plaintext` to enable (**NOT RECOMMENDED FOR PRODUCTION**)
+  use `--plaintext` to disable hashed match (**NOT RECOMMENDED FOR PRODUCTION**)
 
 ## Configs
 
-All `[time]` configs accept format supported by [vercel/ms](https://github.com/vercel/ms).
+All `[time]` configs accept formats supported by [vercel/ms](https://github.com/vercel/ms).
 
 | ENV variable       | Description                      |
 | ------------------ | -------------------------------- |
@@ -44,11 +44,11 @@ openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 \
   -keyout jwt_private.pem -out jwt_public.pem
 ```
 
-> TODO: add Node instructions (with [`crypto.generateKeyPairSync()`](https://nodejs.org/api/crypto.html#crypto_crypto_generatekeypairsync_type_options))
+> TODO: add Node.js instructions (with [`crypto.generateKeyPairSync()`](https://nodejs.org/api/crypto.html#crypto_crypto_generatekeypairsync_type_options))
 
 ### User Credentials
 
-Sample `user_plaintext.json`/`users.json` are in `sample/`, **DO NOT** use in production.  
+Sample `user_plaintext.json`/`users.json` are in `sample/`, **DO NOT** use them in production.  
 Hashed password can be created with:
 
 ```sh
