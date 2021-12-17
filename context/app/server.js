@@ -88,7 +88,7 @@ server.route({
       // console.log("record:", record);
 
       if (record === undefined || record.captcha !== request.payload.captcha) {
-        request.log(["info"], `invalid captcha`);
+        request.log(["info"], `[${username}] invalid captcha`);
         return Boom.unauthorized("invalid.login");
       }
     }
@@ -197,6 +197,7 @@ server.route({
       const decoded = Jwt.verify(request.params.jwt, PUBLIC_KEY, {
         algorithm: "RS256",
       });
+      request.log(["debug"], `${JSON.encode(decoded)}`);
       return decoded;
     } catch (err) {
       request.log(["error"], "invalid token");
