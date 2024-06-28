@@ -197,9 +197,36 @@ server.route({
       const decoded = Jwt.verify(request.params.jwt, PUBLIC_KEY, {
         algorithm: "RS256",
       });
-      request.log(["debug"], `${JSON.encode(decoded)}`);
+      request.log(["debug"], `${JSON.stringify(decoded)}`);
       return decoded;
     } catch (err) {
+      // console.error(err);
+      request.log(["error"], "invalid token");
+      return Boom.forbidden("invalid.token");
+    }
+  },
+  options: {
+    description: "verify a JWT",
+    validate: {
+      params: Joi.object({
+        jwt: Joi.string().required(),
+      }),
+    },
+  },
+});
+
+server.route({
+  method: "GET",
+  path: "/decode/{jwt}",
+  handler: (request, h) => {
+    try {
+      const decoded = Jwt.decode(request.params.jwt, PUBLIC_KEY, {
+        algorithm: "RS256",
+      });
+      request.log(["debug"], `${JSON.stringify(decoded)}`);
+      return decoded;
+    } catch (err) {
+      // console.error(err);
       request.log(["error"], "invalid token");
       return Boom.forbidden("invalid.token");
     }

@@ -94,15 +94,15 @@ docker service create --name docker-auth-server -p 8000:8000 \
 
 ```sh
 # getting JWT
-http -b POST http://localhost:8000/ username=admin password=admin
-http -b POST http://localhost:8000/ username=user password=user
+xh -b POST http://localhost:8000/ username=admin password=admin
+xh -b POST http://localhost:8000/ username=user password=user
 
 # validating JWT
-TOKEN=$(http -b POST http://localhost:8000/ username=admin password=admin)
-http -b "http://localhost:8000/verify/$TOKEN"
+TOKEN=$(xh -b POST http://localhost:8000/ username=admin password=admin)
+xh -b "http://localhost:8000/verify/$TOKEN"
 
 # validating JWT with captcha enabled
 # get and solve captcha at `http://localhost:8000/captcha.html` first
-TOKEN=$(http -b POST http://localhost:8000/ username=admin password=admin sessionId=Xe7OiAoluOSLhyVtPD8S9 captcha=ZQJR)
-http -b "http://localhost:8000/verify/$TOKEN"
+TOKEN=$(xh -b POST http://localhost:8000/ username=admin password=admin sessionId=Xe7OiAoluOSLhyVtPD8S9 captcha=ZQJR)
+xh -b "http://localhost:8000/verify/$TOKEN"
 ```

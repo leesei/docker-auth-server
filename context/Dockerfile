@@ -1,4 +1,4 @@
-FROM node:16-slim
+FROM node:20-slim
 ENV NODE_ENV "production"
 
 ENV NPM_CONFIG_CACHE="/cache/.npm"
@@ -13,7 +13,7 @@ ENV PRIVATE_KEY_PATH="/configs/jwt_private.pem"
 ENV USERS_PATH="/configs/users.json"
 
 WORKDIR /opt/app
-COPY app/package.json app/yarn.lock ./
+COPY app/package.json package-lock.json ./
 RUN yarn install
 COPY app .
 
