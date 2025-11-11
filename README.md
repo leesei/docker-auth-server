@@ -1,6 +1,6 @@
 # docker-auth-server
 
-[![leesei/auth-server](https://dockeri.co/image/leesei/auth-server)](https://hub.docker.com/r/leesei/auth-server)
+[🐋 Docker Hub](https://hub.docker.com/r/leesei/auth-server) [</> Source Code](https://github.com/leesei/docker-auth-server)
 
 Dockerized JWT key server with [auth0/node-jsonwebtoken](https://github.com/auth0/node-jsonwebtoken).
 
@@ -10,7 +10,7 @@ Dockerized JWT key server with [auth0/node-jsonwebtoken](https://github.com/auth
 - does not support secured connection  
   relies on the network layer (reverse proxy, VPC or secure overlay network) for security
 - listens on port `8000` by default
-- supports [svg-captcha](https://openbase.com/js/svg-captcha) MFA  
+- supports [svg-captcha](https://www.npmjs.com/package/svg-captcha) MFA  
   client must use `/captcha` or `/captcha.html` and solve the captcha first  
   temp sessions will be created with [techfort/LokiJS](https://github.com/techfort/LokiJS/)
 - Captcha is disable by default  
@@ -66,9 +66,7 @@ cd context/app/
 cd context/app/
 cp .env.sample .env
 bun start
-```
 
-```sh
 # docker staging, using mount
 docker run -it --rm --name docker-auth-server -p 8000:8000 \
   -v $PWD/sample:/configs \
@@ -117,3 +115,6 @@ xh -b "http://localhost:8000/verify/$TOKEN"
 ## TODO
 
 - convert to TypeScript?
+- replace unmaintained [produck/svg-captcha](https://github.com/produck/svg-captcha) with [lovezhangchuangxin/captcha](https://github.com/lovezhangchuangxin/captcha)?  
+  https://github.com/produck/svg-captcha/issues/45  
+  https://github.com/lingsamuel/svg-captcha

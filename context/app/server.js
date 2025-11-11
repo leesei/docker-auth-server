@@ -53,12 +53,11 @@ const server = Hapi.Server({
     validate: {
       failAction: async (request, h, err) => {
         // In prod, log limited error message and return the default Bad Request error
-        // In dev, log and respond with the full error
         if (process.env.NODE_ENV === "production") {
           request.log(["error"], err.message);
           throw Boom.badRequest(`validation.error`);
         } else {
-          // In dev, log and respond with the full error.
+          // In dev, log and respond with the full error
           console.error(err);
           return err;
         }
