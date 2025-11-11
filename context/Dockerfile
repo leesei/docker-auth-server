@@ -26,6 +26,12 @@ ENV PUBLIC_KEY_PATH="/configs/jwt_public.pem"
 ENV PRIVATE_KEY_PATH="/configs/jwt_private.pem"
 ENV USERS_PATH="/configs/users.json"
 
+WORKDIR /opt/app
+COPY app/package.json app/bun.lock ./
+# npm takes ages to install, so using yarn
+RUN bun install
+COPY app .
+
 COPY entrypoint.sh /opt/
 
 VOLUME "/configs"
