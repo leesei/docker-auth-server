@@ -7,4 +7,5 @@ if [ -z "$DOCKER_IMAGE_NAME" ]; then
 	exit 1
 fi
 
-docker build -t $DOCKER_IMAGE_NAME $DIR/context
+# --pull to always get the latest base image
+docker build --pull -t $DOCKER_IMAGE_NAME $DIR/context
