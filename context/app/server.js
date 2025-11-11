@@ -32,6 +32,7 @@ const argv = require("minimist")(process.argv.slice(2), {
 });
 // console.log(argv); process.exit(0);
 
+// session expiry
 const SESSION_TTL = process.env.SESSION_TTL || "5m";
 const db = new Loki("lokidb");
 // collection to store `{ sessionId: string, captcha: string }`
@@ -42,6 +43,7 @@ const captchas = db.addCollection("captchas", {
 });
 
 const ISSUER = process.env.ISSUER || "test.jwt.server";
+// JWT expiry
 const EXPIRES_IN = process.env.EXPIRY || "1d";
 const server = Hapi.Server({
   host: "0.0.0.0",
@@ -54,8 +56,9 @@ const server = Hapi.Server({
         // In dev, log and respond with the full error
         if (process.env.NODE_ENV === "production") {
           request.log(["error"], err.message);
-          return Boom.badRequest(`invalid.request`);
+          throw Boom.badRequest(`validation.error`);
         } else {
+          // In dev, log and respond with the full error.
           console.error(err);
           return err;
         }

@@ -14,4 +14,4 @@ for file in $CONFIG_FILES; do
 done
 
 # echo $@
-exec node /opt/app/server.js "$@"
+exec bun /opt/app/server.js "$@"

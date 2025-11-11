@@ -64,19 +64,26 @@ cd context/app/
 ```sh
 # local development, configured to load `../../sample/`
 cd context/app/
-yarn start
+cp .env.sample .env
+bun start
 ```
 
 ```sh
 # docker staging, using mount
 docker run -it --rm --name docker-auth-server -p 8000:8000 \
   -v $PWD/sample:/configs \
-  -v $PWD/context/app:/pwd -w /pwd \
   --entrypoint bash \
   leesei/auth-server
 ```
 
 ```sh
+docker run --rm --name docker-auth-server -p 8000:8000 \
+  -v $PWD/sample:/configs \
+  leesei/auth-server
+docker run --rm --name docker-auth-server -p 8000:8000 \
+  -v $PWD/sample:/configs \
+  leesei/auth-server --captcha
+
 # docker, using docker secret and config
 cd sample/    # or your deployment config
 docker secret create jwt_private ./jwt_private.pem
@@ -103,6 +110,10 @@ xh -b "http://localhost:8000/verify/$TOKEN"
 
 # validating JWT with captcha enabled
 # get and solve captcha at `http://localhost:8000/captcha.html` first
-TOKEN=$(xh -b POST http://localhost:8000/ username=admin password=admin sessionId=Xe7OiAoluOSLhyVtPD8S9 captcha=ZQJR)
+TOKEN=$(xh -b POST http://localhost:8000/ username=admin password=admin sessionId=dgLEbugy0CO3ZcJAfsZJ_ captcha=OM5N)
 xh -b "http://localhost:8000/verify/$TOKEN"
 ```
+
+## TODO
+
+- convert to TypeScript?

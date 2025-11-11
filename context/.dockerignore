@@ -1,4 +1,4 @@
-**/node_modules/
 **/.env*
-**/*.log
 **/.git/
+**/*.log
+**/node_modules/
